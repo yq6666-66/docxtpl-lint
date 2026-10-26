@@ -7,7 +7,8 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Changed
-- Root `README.md` and `README.zh.md` were rewritten to remove reader-facing Markdown unordered lists per no-markdown-bullets Skill v3.2.0. Ordered lists, tables, and code are kept. No functional change.
+
+Root `README.md` and `README.zh.md`: reader-facing Markdown unordered lists were converted to ordered lists. Code blocks and tables are unchanged. No functional change.
 
 ## [2.0.1] - 2026-10-16
 
