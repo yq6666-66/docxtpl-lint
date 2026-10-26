@@ -6,6 +6,9 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+- Root `README.md` and `README.zh.md` were rewritten to remove reader-facing Markdown unordered lists per no-markdown-bullets Skill v3.2.0. Ordered lists, tables, and code are kept. No functional change.
+
 ## [2.0.1] - 2026-10-16
 
 First release of 2.0. The `v2.0.0` tag was pushed but never released: CI's ruff import-order check failed on test files, so 2.0.0 is not on PyPI. 2.0.1 = 2.0.0 + sorted test imports.

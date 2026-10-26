@@ -20,11 +20,11 @@ jinja2.exceptions.TemplateSyntaxError: Encountered unknown tag 'endfor'. Jinja w
 
 更糟的是，很多错误根本不报错，只是生成的文档不对。docxtpl-lint 一次报告所有问题，每个都带位置（正文/页眉/页脚/脚注、段落，以及 `T1 R2 C2 > T2 R2 C1` 这样的表格路径）：
 
-- **结构错误：** 未闭合或多余的 `if`/`for`，标签没有闭合，Jinja 语法错误，标签跨段落。
-- **docxtpl 特有的坑：** `{%tr %}`、`{%tc %}`、`{%p %}` 用法错误。例如前缀不匹配会静默丢失表格行（[#603](https://github.com/elapouya/python-docx-template/issues/603)），`{%p %}` 里出现 `%` 会出错（[#644](https://github.com/elapouya/python-docx-template/issues/644)），`{%p %}` 旁边的文字会静默消失。
-- **Jinja 错误：** 未知的过滤器和测试，循环变量在循环外使用。
-- **Word 遗留问题：** 未接受的修订删除里残留模板代码（会泄漏到每份生成的文档里）。
-- **数据不匹配**（对照示例 JSON 或 JSON Schema）：缺少变量，对非列表做循环，给 `{{r}}` 传普通字符串，以及关闭 autoescape 时被 docxtpl 静默截断的 `&`、`<`。
+1. **结构错误：** 未闭合或多余的 `if`/`for`，标签没有闭合，Jinja 语法错误，标签跨段落。
+2. **docxtpl 特有的坑：** `{%tr %}`、`{%tc %}`、`{%p %}` 用法错误。例如前缀不匹配会静默丢失表格行（[#603](https://github.com/elapouya/python-docx-template/issues/603)），`{%p %}` 里出现 `%` 会出错（[#644](https://github.com/elapouya/python-docx-template/issues/644)），`{%p %}` 旁边的文字会静默消失。
+3. **Jinja 错误：** 未知的过滤器和测试，循环变量在循环外使用。
+4. **Word 遗留问题：** 未接受的修订删除里残留模板代码（会泄漏到每份生成的文档里）。
+5. **数据不匹配**（对照示例 JSON 或 JSON Schema）：缺少变量，对非列表做循环，给 `{{r}}` 传普通字符串，以及关闭 autoescape 时被 docxtpl 静默截断的 `&`、`<`。
 
 ## 安装
 
@@ -83,10 +83,10 @@ docxtpl-lint contract.docx --schema schema.json    # DTL304/DTL305
 
 `infer` 生成模板所需数据的 JSON Schema（2020-12）：
 
-- `for` 循环推断为列表，并包含嵌套字段；
-- 算术、`round` 和比较推断为数字；
-- `is defined`/`default` 推断为可选字段；
-- `{{r}}`/`{{p}}` 推断为 `RichText`/`Subdoc` 对象。
+1. `for` 循环推断为列表，并包含嵌套字段；
+2. 算术、`round` 和比较推断为数字；
+3. `is defined`/`default` 推断为可选字段；
+4. `{{r}}`/`{{p}}` 推断为 `RichText`/`Subdoc` 对象。
 
 传入多个模板时会合并它们的 schema，并标注每个字段被哪些模板使用。`--sample` 同时生成可渲染的示例数据（`--items N` 设列表条数），`--pydantic` 生成 Pydantic v2 模型。
 
@@ -94,8 +94,8 @@ docxtpl-lint contract.docx --schema schema.json    # DTL304/DTL305
 
 `docxtpl-lint verify a.docx` 用真实的 docxtpl 渲染模板，每个变量填一个唯一的哨兵值，然后报告：
 
-- 没有出现在输出里的 `{{ value }}`（DTL401）；
-- 渲染失败（DTL402）。
+1. 没有出现在输出里的 `{{ value }}`（DTL401）；
+2. 渲染失败（DTL402）。
 
 用 `--data`（可重复）可以改用你自己的数据渲染。`--jinja-env MODULE:ATTR` 和 `--autoescape` 让它按你的应用方式渲染，`--out DIR` 保留渲染结果。
 
@@ -109,10 +109,10 @@ docxtpl-lint diff old.docx new.docx --fail-on breaking   # 也可用 change、ne
 
 以下变化算破坏性：
 
-- 新增必填字段；
-- 列表与对象互换；
-- 可选变必填；
-- 普通值变 `RichText`/`Subdoc`。
+1. 新增必填字段；
+2. 列表与对象互换；
+3. 可选变必填；
+4. 普通值变 `RichText`/`Subdoc`。
 
 删除字段不算破坏性，疑似改名会给出提示。
 
@@ -136,9 +136,9 @@ docxtpl-lint templates/*.docx --baseline bl.json         # 只有新问题才失
 
 也可以在模板里用 Jinja 注释屏蔽规则（docxtpl 渲染时不输出任何内容）：
 
-- `{# docxtpl-lint: disable=DTL301 #}` 作用于整个模板；
-- `disable-line=` 作用于当前段落；
-- `{#p docxtpl-lint: disable-next=… #}` 作用于下一段。
+1. `{# docxtpl-lint: disable=DTL301 #}` 作用于整个模板；
+2. `disable-line=` 作用于当前段落；
+3. `{#p docxtpl-lint: disable-next=… #}` 作用于下一段。
 
 没有屏蔽到任何问题的注释会报 DTL005。
 
@@ -155,8 +155,8 @@ docxtpl-lint templates/*.docx --baseline bl.json         # 只有新问题才失
 
 用 `--format F`、`-o FILE` 和 `--report FORMAT:FILE`（可重复）可以一次运行生成多份报告。另外两种输出：
 
-- `--statistics` 按规则统计数量；
-- `--annotate DIR` 生成每个问题带一条 Word 批注的模板副本，方便在 Word 里改模板的人使用。
+1. `--statistics` 按规则统计数量；
+2. `--annotate DIR` 生成每个问题带一条 Word 批注的模板副本，方便在 Word 里改模板的人使用。
 
 ### CI：GitHub Action、pre-commit、GitLab
 
@@ -238,19 +238,19 @@ jinja-env = "myapp.reports:jinja_env" # 从你的环境读取自定义过滤器/
 
 ## 工作原理
 
-- **直接读取 `.docx`。** 用 lxml 读取 OOXML 各部件（正文、页眉、页脚、脚注），包括表格结构、域代码、文本框和修订。检查时不导入 docxtpl，也不修改文件。
-- **复现 docxtpl 的预处理。** 使用与 docxtpl 相同的标签清理正则，以及相同的 `{%p/tr/tc/r %}` 处理，所以分析的文本就是 docxtpl 的 Jinja 实际看到的内容。每条 docxtpl 规则都有测试，用真实 docxtpl 渲染错误模板，证明它确实会出问题。
-- **自有标签栈加 Jinja AST。** 块结构问题由自己的标签栈检查，因此能一次报出全部问题。Jinja 的语法和语义（过滤器、测试、作用域、变量路径、类型）来自 Jinja2 解析后的 AST 分析，同一份分析也生成 `infer`、`--data` 和 `--schema` 用的数据契约。
-- **关键处真实渲染。** `verify` 和 `check_context` 用 docxtpl 本身渲染，数据为哨兵值或你提供的数据。
-- **在真实模板上验证。** CI 检查 docxtpl 自带测试集中的 40 个模板（0 误报，故意写坏的那个能被发现），以及 86 个经真实渲染裁决的对抗用例（[基准](benchmark/expected.json)、[对抗用例](benchmark/adversarial_adjudicated.json)）。
-- **能在浏览器运行。** 纯 Python wheel 可以在 Pyodide 中加载，用于在线试用页面。
+1. **直接读取 `.docx`。** 用 lxml 读取 OOXML 各部件（正文、页眉、页脚、脚注），包括表格结构、域代码、文本框和修订。检查时不导入 docxtpl，也不修改文件。
+2. **复现 docxtpl 的预处理。** 使用与 docxtpl 相同的标签清理正则，以及相同的 `{%p/tr/tc/r %}` 处理，所以分析的文本就是 docxtpl 的 Jinja 实际看到的内容。每条 docxtpl 规则都有测试，用真实 docxtpl 渲染错误模板，证明它确实会出问题。
+3. **自有标签栈加 Jinja AST。** 块结构问题由自己的标签栈检查，因此能一次报出全部问题。Jinja 的语法和语义（过滤器、测试、作用域、变量路径、类型）来自 Jinja2 解析后的 AST 分析，同一份分析也生成 `infer`、`--data` 和 `--schema` 用的数据契约。
+4. **关键处真实渲染。** `verify` 和 `check_context` 用 docxtpl 本身渲染，数据为哨兵值或你提供的数据。
+5. **在真实模板上验证。** CI 检查 docxtpl 自带测试集中的 40 个模板（0 误报，故意写坏的那个能被发现），以及 86 个经真实渲染裁决的对抗用例（[基准](benchmark/expected.json)、[对抗用例](benchmark/adversarial_adjudicated.json)）。
+6. **能在浏览器运行。** 纯 Python wheel 可以在 Pyodide 中加载，用于在线试用页面。
 
 ## 局限
 
-- **静态检查依赖你提供的数据。** 没有 `--data`/`--schema` 时，类型错误只能靠 `verify` 或渲染时发现。不检查自定义 Jinja 扩展、`include` 和宏签名。
-- **跳过 docxtpl 不渲染的部件：** 尾注、批注、图表、嵌入对象。文本框作为所在段落的一部分检查。
-- **`¶N` 按部件里所有 `<w:p>` 计数**，包括表格单元格里的空段落。请结合表格路径和打印出的片段在 Word 中定位。
-- **DTL201 遵循 docxtpl ≤ 0.20.2 的正则。** 如果上游放宽（PR [#645](https://github.com/elapouya/python-docx-template/pull/645)），请用 `--ignore DTL201`。
+1. **静态检查依赖你提供的数据。** 没有 `--data`/`--schema` 时，类型错误只能靠 `verify` 或渲染时发现。不检查自定义 Jinja 扩展、`include` 和宏签名。
+2. **跳过 docxtpl 不渲染的部件：** 尾注、批注、图表、嵌入对象。文本框作为所在段落的一部分检查。
+3. **`¶N` 按部件里所有 `<w:p>` 计数**，包括表格单元格里的空段落。请结合表格路径和打印出的片段在 Word 中定位。
+4. **DTL201 遵循 docxtpl ≤ 0.20.2 的正则。** 如果上游放宽（PR [#645](https://github.com/elapouya/python-docx-template/pull/645)），请用 `--ignore DTL201`。
 
 ## 相关项目
 
