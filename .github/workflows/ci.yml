@@ -4,6 +4,8 @@ on:
   pull_request:
   schedule:
     - cron: "0 3 * * 1"  # weekly: catch docxtpl upstream changes
+permissions:
+  contents: read
 jobs:
   test:
     runs-on: ${{ matrix.os }}
@@ -16,8 +18,10 @@ jobs:
           - os: windows-latest
             python: "3.12"
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: ${{ matrix.python }}
       - run: pip install -e ".[dev]"
@@ -31,18 +35,24 @@ jobs:
       matrix:
         docxtpl: ["docxtpl", "git+https://github.com/elapouya/python-docx-template.git"]
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
-      - run: pip install -e ".[dev]" && pip install --upgrade "${{ matrix.docxtpl }}"
+      - env:
+          DOCXTPL_SPEC: ${{ matrix.docxtpl }}
+        run: pip install -e ".[dev]" && pip install --upgrade "$DOCXTPL_SPEC"
       - run: pytest -q tests/test_docxtpl_behaviour.py tests/test_v13.py tests/test_v14.py
   benchmark:
     # 0 false positives on python-docx-template's own test templates (benchmark/expected.json).
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
       - run: pip install -e .[render]
@@ -54,11 +64,13 @@ jobs:
     # The wheel must keep working inside Pyodide (browser playground).
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: "24"
       - run: pip install build && python -m build --wheel && pip install dist/*.whl && bash scripts/build_site.sh
@@ -67,7 +79,9 @@ jobs:
     # Dogfood the composite action on the bundled examples (path with a space included).
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - run: mkdir -p "tmp dir" && cp examples/clean.docx "tmp dir/clean copy.docx"
       - uses: ./
         with:
@@ -82,14 +96,18 @@ jobs:
           files: examples/issue*.docx
           sarif: docxtpl-lint.sarif
           annotate: "true"
-      - run: |
-          test "${{ steps.bad.outcome }}" = "failure"
+      - env:
+          BAD_OUTCOME: ${{ steps.bad.outcome }}
+        run: |
+          test "$BAD_OUTCOME" = "failure"
           python -c "import json; r=json.load(open('docxtpl-lint.sarif'))['runs'][0]['results']; assert r and all('partialFingerprints' in x for x in r)"
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
       - run: pip install build twine && python -m build && twine check dist/*
